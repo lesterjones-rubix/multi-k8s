@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t lesterjones/react-test -f ./client/Dockerfile.dev ./client
+
+script: #-- --coverage So that the test script eventually enters with 0 or not 0
+  - docker run lesterjones/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t lesterjones/multi-client ./client
+  - docker build -t lesterjones/multi-nginx ./nginx
+  - docker build -t lesterjones/multi-server ./server
+  - docker build -t lesterjones/multi-worker ./worker
+  # First login to the docker CLI (environmental variables travis.org)
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #Take these images and push them to docker hub
+  - docker push lesterjones/multi-client
+  - docker push lesterjones/multi-nginx
+  - docker push lesterjones/multi-server
+  - docker push lesterjones/multi-worker
