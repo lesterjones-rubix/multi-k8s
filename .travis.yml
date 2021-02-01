@@ -6,7 +6,7 @@ before_install:
   - docker build -t lesterjones/react-test -f ./client/Dockerfile.dev ./client
 
 script: #-- --coverage So that the test script eventually enters with 0 or not 0
-  - docker run lesterjones/react-test npm test -- --coverage
+  - docker run -e CI=true lesterjones/react-test npm test
 
 after_success:
   - docker build -t lesterjones/multi-client ./client
